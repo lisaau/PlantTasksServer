@@ -28,6 +28,12 @@ app.get('/plants/:id', (req, res) => {
     res.json(plants.filter(plant => plant['id'] === id));
 });
 
+app.post('/plant', async (req, res) => {
+    let { plantId, plantName, plantSpecies } = req.body;
+    await plants.push({'id': plantId, 'name': plantName, 'species': plantSpecies});
+    res.sendStatus(200)
+});
+
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
     console.log(`The application is running on localhost:${PORT}`);
