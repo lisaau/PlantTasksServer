@@ -28,10 +28,11 @@ app.get('/plants/:id', (req, res) => {
     res.json(plants.filter(plant => plant['id'] === id));
 });
 
-app.post('/plant', async (req, res) => {
-    let { plantId, plantName, plantSpecies } = req.body;
-    await plants.push({'id': plantId, 'name': plantName, 'species': plantSpecies});
-    res.sendStatus(200)
+app.post('/plant', (req, res) => {
+    let { plantName, plantSpecies } = req.body;
+    let newPlant = {'id': plants.length + 1, 'name': plantName, 'species': plantSpecies};
+    plants.push(newPlant);
+    res.json(newPlant)
 });
 
 const PORT = process.env.PORT || 8000;
