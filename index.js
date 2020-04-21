@@ -35,6 +35,12 @@ app.post('/plant', (req, res) => {
     res.json(newPlant)
 });
 
+app.delete('/plant', (req, res) => {
+    let { plantId } = req.body;
+    plants.filter(plant => plant.id !== plantId);
+    res.json(plants)
+});
+
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
     console.log(`The application is running on localhost:${PORT}`);
