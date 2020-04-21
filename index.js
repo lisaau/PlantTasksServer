@@ -37,8 +37,12 @@ app.post('/plant', (req, res) => {
 
 app.delete('/plant', (req, res) => {
     let { plantId } = req.body;
-    plants.filter(plant => plant.id !== plantId);
-    res.json(plants)
+    // find the index of the plant of a particular ID and if it's there, remove it
+    const index = plants.indexOf(plants.find( plant => plant.id === parseInt(plantId)));
+    if (index > -1) {
+        res.json(plants.splice(index, 1));
+    }
+    // res.json(plants.filter(plant => plant.id !== parseInt(plantId)))
 });
 
 const PORT = process.env.PORT || 8000;
