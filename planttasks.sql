@@ -71,9 +71,6 @@ ALTER TABLE ONLY public.plants ALTER COLUMN id SET DEFAULT nextval('public.plant
 COPY public.plants (id, name, species, notes, image) FROM stdin;
 1	Planty	Air Plant	Taking care of Planty for Kim	\N
 2	Planty 2	Green Onion	Tastes delicious	\N
-3	Planty 3	Iris	\N	\N
-5	Planty 4	Tulip	\N	\N
-4	Daisy the Daisy	Daisy	\N	\N
 \.
 
 
