@@ -1,4 +1,10 @@
 const express = require('express');
+const PlantTasksDatabase = require('./src/plantTasks-database');
+
+const PORT = process.env.PORT || 8000;
+const DEFAULT_DB_NAME = 'planttasks';
+const dbName = process.env.DB_NAME || DEFAULT_DB_NAME;
+const db = new PlantTasksDatabase(dbName); // replace plants with db
 
 // TEST DATA
 const plants = [
@@ -10,17 +16,43 @@ const plants = [
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const app = express();
+const bodyDebugMiddleware = require('./src/body-debug-middleware');
 
+app.use(bodyDebugMiddleware);
 app.use(bodyParser.urlencoded({ extended: true })); // needed for Postman
 app.use(bodyParser.json());
 app.use(morgan('tiny'));
 
-app.get('/test', (req, res) => {
-    res.send('hello');
+// --------TEST ENDPOINTS-------- //
+app.get('/tests', (req, res) => {
+    db.getAllPlants().then(plants => res.send(plants))
 });
 
+app.get('/test/:id', (req, res) => {
+    let id = parseInt(req.params.id)
+    db.getPlant(id).then(plant => res.send(plant))
+});
+
+app.post('/test', (req, res) => {
+    let { plantName, plantSpecies } = req.body;
+    db.addPlant(plantName, plantSpecies).then(plant => res.send(plant))
+});
+
+app.delete('/test', (req, res) => {
+    let { plantId } = req.body;
+    db.deletePlant(plantId).then(plant => res.send(plant))
+});
+
+app.put('/test', (req, res) => {
+    let { plantId, plantName, plantSpecies } = req.body;
+    plantId = parseInt(plantId);
+    db.editPlant(plantId, plantName, plantSpecies).then(plant => res.send(plant))
+});
+
+// ------------------------------ //
+
 app.get('/plants', (req, res) => {
-    res.json(plants);
+    res.json(plants); 
 });
 
 app.get('/plants/:id', (req, res) => {
@@ -70,7 +102,8 @@ app.put('/plant', (req, res) => {
     res.json([editedPlant, editedPlantIndex]) 
 });
 
-const PORT = process.env.PORT || 8000;
-app.listen(PORT, () => {
-    console.log(`The application is running on localhost:${PORT}`);
-});
+db.sanityCheck().then(() => {
+    app.listen(PORT, () => {
+        console.log(`The application is running on localhost:${PORT}`);
+    });
+})
