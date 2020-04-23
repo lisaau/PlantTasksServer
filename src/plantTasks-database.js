@@ -37,16 +37,16 @@ class PlantTasksDatabase {
     return this.db.one('SELECT * FROM plants WHERE id = $1', plantId);
   }
 
-  addPlant(plantName, plantSpecies) {
-    return this.db.one('INSERT INTO plants (name, species) VALUES($1, $2) RETURNING *',[plantName, plantSpecies]);
+  addPlant(plantName, plantSpecies, plantNotes) {
+    return this.db.one('INSERT INTO plants (name, species, notes) VALUES($1, $2, $3) RETURNING *',[plantName, plantSpecies, plantNotes]);
   }
   
   deletePlant(plantId) {
     return this.db.one('DELETE FROM plants WHERE id = $1 RETURNING *', plantId);
   }
   
-  editPlant(plantId, plantName, plantSpecies) {
-    return this.db.one('UPDATE plants SET name = $2, species = $3 WHERE id = $1 RETURNING *', [plantId, plantName, plantSpecies]);
+  editPlant(plantId, plantName, plantSpecies, plantNotes) {
+    return this.db.one('UPDATE plants SET name = $2, species = $3, notes = $4 WHERE id = $1 RETURNING *', [plantId, plantName, plantSpecies, plantNotes]);
   }
 }
 

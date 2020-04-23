@@ -30,8 +30,8 @@ app.get('/plant/:id', (req, res) => {
 });
 
 app.post('/plant', (req, res) => {
-    let { plantName, plantSpecies } = req.body;
-    db.addPlant(plantName, plantSpecies).then(plant => res.send(plant))
+    let { plantName, plantSpecies, plantNotes } = req.body;
+    db.addPlant(plantName, plantSpecies, plantNotes).then(plant => res.send(plant))
 });
 
 app.delete('/plant', (req, res) => {
@@ -40,9 +40,9 @@ app.delete('/plant', (req, res) => {
 });
 
 app.put('/plant', (req, res) => {
-    let { plantId, plantName, plantSpecies } = req.body;
+    let { plantId, plantName, plantSpecies, plantNotes } = req.body;
     plantId = parseInt(plantId);
-    db.editPlant(plantId, plantName, plantSpecies).then(plant => res.send(plant))
+    db.editPlant(plantId, plantName, plantSpecies, plantNotes).then(plant => res.send(plant))
 });
 
 
