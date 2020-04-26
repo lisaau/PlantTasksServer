@@ -45,6 +45,24 @@ app.put('/plant', (req, res) => {
     db.editPlant(plantId, plantName, plantSpecies, plantNotes).then(plant => res.send(plant))
 });
 
+app.get('/taskinstances', (req, res) => {
+    db.getTaskInstances().then(taskInstances => res.send(taskInstances))
+})
+
+app.get('/tasks/plant/:id', (req, res) => {
+    let id = parseInt(req.params.id)
+    db.getTaskOfPlant(id).then(tasks => res.send(tasks))
+})
+
+app.post('/task', (req, res) => {
+    let { description, frequency, plantId } = req.body;
+    db.addTask(description, frequency, plantId).then(task => res.send(task))
+})
+
+app.delete('/task', (req, res) => {
+    let { plantId } = req.body;
+    db.deleteTask(plantId).then(task => res.send(task))
+});
 
 db.sanityCheck().then(() => {
     app.listen(PORT, () => {

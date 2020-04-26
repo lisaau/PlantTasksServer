@@ -48,6 +48,28 @@ class PlantTasksDatabase {
   editPlant(plantId, plantName, plantSpecies, plantNotes) {
     return this.db.one('UPDATE plants SET name = $2, species = $3, notes = $4 WHERE id = $1 RETURNING *', [plantId, plantName, plantSpecies, plantNotes]);
   }
+
+  getTaskInstances() {
+    return this.db.any(`SELECT ti.id, ti.completed, ti.due_date, t.id, t.description, t.frequency, p.id, p.name, p.species, p.notes, p.image 
+      FROM task_instances AS ti 
+      INNER JOIN tasks AS t ON t.id = ti.task_id 
+      INNER JOIN plants AS p ON p.id = t.plant_id`)
+  }
+
+  getTaskOfPlant(plantId) {
+    return this.db.any(`SELECT t.*, p.name 
+      FROM tasks AS t
+      INNER JOIN plants AS p ON p.id = t.plant_id
+      WHERE p.id = $1`, plantId)
+  }
+
+  addTask(description, frequency, plantId) {
+    return this.db.one('INSERT INTO tasks (plant_id, description, frequency) VALUES($1, $2, $3) RETURNING *', [plantId, description, frequency])
+  }
+
+  deleteTask(plantId) {
+    return this.db.one('DELETE FROM tasks WHERE id = $1 RETURNING *', plantId);
+  }
 }
 
 module.exports = PlantTasksDatabase;
