@@ -25,6 +25,7 @@ class PlantTasksDatabase {
     );
   }
 
+  // Plants
   getPlantsCount() {
     return this.db.one('SELECT count(*) FROM plants').then(r => r.count);
   }
@@ -49,6 +50,7 @@ class PlantTasksDatabase {
     return this.db.one('UPDATE plants SET name = $2, species = $3, notes = $4 WHERE id = $1 RETURNING *', [plantId, plantName, plantSpecies, plantNotes]);
   }
   
+  // Tasks
   getTaskOfPlant(plantId) {
     return this.db.any(`SELECT t.*, p.name 
     FROM tasks AS t
@@ -68,6 +70,7 @@ class PlantTasksDatabase {
     return this.db.one('DELETE FROM tasks WHERE id = $1 RETURNING *', taskId);
   }
   
+  // Task Instances
   getTaskInstances() {
     return this.db.any(`SELECT ti.id AS task_instance_id, ti.completed, ti.due_date, t.id AS task_id, t.description, t.frequency, p.id AS plant_id, p.name
       FROM task_instances AS ti 
