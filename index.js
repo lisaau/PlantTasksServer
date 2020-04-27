@@ -64,6 +64,11 @@ app.delete('/task', (req, res) => {
     db.deleteTask(plantId).then(task => res.send(task))
 });
 
+app.put('/taskinstance', (req, res) => {
+    let { status, taskInstanceId } = req.body;
+    db.updateTaskInstance(status, taskInstanceId).then(taskInstance => res.send(taskInstance))
+});
+
 db.sanityCheck().then(() => {
     app.listen(PORT, () => {
         console.log(`The application is running on localhost:${PORT}`);

@@ -70,6 +70,10 @@ class PlantTasksDatabase {
   deleteTask(plantId) {
     return this.db.one('DELETE FROM tasks WHERE id = $1 RETURNING *', plantId);
   }
+
+  updateTaskInstance(status, taskInstanceId) {
+    return this.db.one('UPDATE task_instances SET completed = $1 WHERE id = $2 RETURNING *', [status, taskInstanceId])
+  }
 }
 
 module.exports = PlantTasksDatabase;
