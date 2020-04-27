@@ -48,27 +48,31 @@ class PlantTasksDatabase {
   editPlant(plantId, plantName, plantSpecies, plantNotes) {
     return this.db.one('UPDATE plants SET name = $2, species = $3, notes = $4 WHERE id = $1 RETURNING *', [plantId, plantName, plantSpecies, plantNotes]);
   }
-
+  
+  getTaskOfPlant(plantId) {
+    return this.db.any(`SELECT t.*, p.name 
+    FROM tasks AS t
+    INNER JOIN plants AS p ON p.id = t.plant_id
+    WHERE p.id = $1`, plantId)
+  }
+  
+  getAllTasks() {
+    return this.db.any('SELECT * FROM tasks ORDER BY id')
+  }
+  
+  addTask(description, frequency, plantId) {
+    return this.db.one('INSERT INTO tasks (description, frequency, plant_id) VALUES($1, $2, $3) RETURNING *', [description, frequency, plantId])
+  }
+  
+  deleteTask(taskId) {
+    return this.db.one('DELETE FROM tasks WHERE id = $1 RETURNING *', taskId);
+  }
+  
   getTaskInstances() {
     return this.db.any(`SELECT ti.id AS task_instance_id, ti.completed, ti.due_date, t.id AS task_id, t.description, t.frequency, p.id AS plant_id, p.name
       FROM task_instances AS ti 
       INNER JOIN tasks AS t ON t.id = ti.task_id
       INNER JOIN plants AS p on p.id = t.plant_id`)
-  }
-
-  getTaskOfPlant(plantId) {
-    return this.db.any(`SELECT t.*, p.name 
-      FROM tasks AS t
-      INNER JOIN plants AS p ON p.id = t.plant_id
-      WHERE p.id = $1`, plantId)
-  }
-
-  addTask(description, frequency, plantId) {
-    return this.db.one('INSERT INTO tasks (description, frequency, plant_id) VALUES($1, $2, $3) RETURNING *', [description, frequency, plantId])
-  }
-
-  deleteTask(taskId) {
-    return this.db.one('DELETE FROM tasks WHERE id = $1 RETURNING *', taskId);
   }
 
   updateTaskInstance(status, taskInstanceId) {

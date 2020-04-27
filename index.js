@@ -45,13 +45,13 @@ app.put('/plant', (req, res) => {
     db.editPlant(plantId, plantName, plantSpecies, plantNotes).then(plant => res.send(plant))
 });
 
-app.get('/taskinstances', (req, res) => {
-    db.getTaskInstances().then(taskInstances => res.send(taskInstances))
-})
-
 app.get('/tasks/plant/:id', (req, res) => {
     let id = parseInt(req.params.id)
     db.getTaskOfPlant(id).then(tasks => res.send(tasks))
+})
+
+app.get('/tasks', (req, res) => {
+    db.getAllTasks().then(tasks => res.send(tasks))
 })
 
 app.post('/task', (req, res) => {
@@ -63,6 +63,10 @@ app.delete('/task', (req, res) => {
     let { taskId } = req.body;
     db.deleteTask(taskId).then(task => res.send(task))
 });
+
+app.get('/taskinstances', (req, res) => {
+    db.getTaskInstances().then(taskInstances => res.send(taskInstances))
+})
 
 app.put('/taskinstance', (req, res) => {
     let { status, taskInstanceId } = req.body;
