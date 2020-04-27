@@ -64,11 +64,11 @@ class PlantTasksDatabase {
   }
 
   addTask(description, frequency, plantId) {
-    return this.db.one('INSERT INTO tasks (plant_id, description, frequency) VALUES($1, $2, $3) RETURNING *', [plantId, description, frequency])
+    return this.db.one('INSERT INTO tasks (description, frequency, plantId) VALUES($1, $2, $3) RETURNING *', [description, frequency, plantId])
   }
 
-  deleteTask(plantId) {
-    return this.db.one('DELETE FROM tasks WHERE id = $1 RETURNING *', plantId);
+  deleteTask(taskId) {
+    return this.db.one('DELETE FROM tasks WHERE id = $1 RETURNING *', taskId);
   }
 
   updateTaskInstance(status, taskInstanceId) {

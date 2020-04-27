@@ -60,8 +60,8 @@ app.post('/task', (req, res) => {
 })
 
 app.delete('/task', (req, res) => {
-    let { plantId } = req.body;
-    db.deleteTask(plantId).then(task => res.send(task))
+    let { taskId } = req.body;
+    db.deleteTask(taskId).then(task => res.send(task))
 });
 
 app.put('/taskinstance', (req, res) => {
