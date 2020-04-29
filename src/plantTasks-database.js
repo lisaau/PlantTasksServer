@@ -78,6 +78,14 @@ class PlantTasksDatabase {
       INNER JOIN plants AS p on p.id = t.plant_id`)
   }
 
+  getTodayTaskInstances() {
+    return this.db.any(`SELECT ti.id AS task_instance_id, ti.completed, ti.due_date, t.id AS task_id, t.description, t.frequency, p.id AS plant_id, p.name
+    FROM task_instances AS ti 
+    INNER JOIN tasks AS t ON t.id = ti.task_id
+    INNER JOIN plants AS p on p.id = t.plant_id 
+    WHERE date_trunc('day', ti.due_date) = date_trunc('day', now())`)
+  }
+
   updateTaskInstance(status, taskInstanceId) {
     return this.db.one('UPDATE task_instances SET completed = $1 WHERE id = $2 RETURNING *', [status, taskInstanceId])
   }

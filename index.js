@@ -71,6 +71,10 @@ app.get('/taskinstances', (req, res) => {
     db.getTaskInstances().then(taskInstances => res.send(taskInstances))
 })
 
+app.get('/taskinstances/today', (req, res) => {
+    db.getTodayTaskInstances().then(taskInstances => res.send(taskInstances))
+})
+
 app.put('/taskinstance', (req, res) => {
     let { status, taskInstanceId } = req.body;
     db.updateTaskInstance(status, taskInstanceId).then(taskInstance => res.send(taskInstance))
