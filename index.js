@@ -7,6 +7,25 @@ const DEFAULT_DB_NAME = 'planttasks';
 const dbName = process.env.DB_NAME || DEFAULT_DB_NAME;
 const db = new PlantTasksDatabase(dbName);
 
+const jwksRsa = require("jwks-rsa");
+const jwt = require("express-jwt");
+
+const authConfig = {
+    domain: "dev-skxc8k2i.auth0.com"
+};
+
+const checkJwt = jwt({
+    secret: jwksRsa.expressJwtSecret({
+        cache: true,
+        rateLimit: true,
+        jwksRequestsPerMinute: 5,
+        jwksUri: `https://${authConfig.domain}/.well-known/jwks.json`
+    }),
+
+    // audience: authConfig.audience,
+    issuer: `https://${authConfig.domain}/`,
+    algorithm: ["RS256"]
+});
 
 // ---------- MIDDLEWARE ---------- //
 const bodyParser = require('body-parser');
@@ -17,11 +36,13 @@ app.use(bodyDebugMiddleware);
 app.use(bodyParser.urlencoded({ extended: true })); // needed for Postman
 app.use(bodyParser.json());
 app.use(morgan('tiny'));
+app.use(checkJwt);
 
 
 // ---------- ROUTES ---------- //
 // Plants
 app.get('/plants', (req, res) => {
+    console.log(req.user)
     db.getAllPlants().then(plants => res.send(plants))
 });
 
@@ -75,11 +96,16 @@ app.get('/taskinstances/today', (req, res) => {
     db.getTodayTaskInstances().then(taskInstances => res.send(taskInstances))
 })
 
+app.get('/taskinstances/:date', (req, res) => {
+    let date = req.params.date
+    console.log(date)
+    db.getTaskInstancesByDay(date).then(taskInstances => res.send(taskInstances))
+})
+
 app.put('/taskinstance', (req, res) => {
     let { status, taskInstanceId } = req.body;
     db.updateTaskInstance(status, taskInstanceId).then(taskInstance => res.send(taskInstance))
 });
-
 
 // Running server
 db.sanityCheck().then(() => {
