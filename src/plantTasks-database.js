@@ -76,7 +76,7 @@ class PlantTasksDatabase {
     return this.db.one(`DELETE FROM tasks AS t 
     USING plants AS p
     WHERE t.id = $1 AND p.user_id = $2
-    RETURNING *`, [taskId, userId]);
+    RETURNING t.*`, [taskId, userId]);
   }
   
   // Task Instances
