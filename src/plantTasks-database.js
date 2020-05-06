@@ -67,7 +67,7 @@ class PlantTasksDatabase {
   
   addTask(description, frequency, plantId, userId) {
     return this.db.one(`INSERT INTO tasks (description, frequency, plant_id) 
-      SELECT ($1, $2, $3) 
+      SELECT $1, $2, $3
       WHERE EXISTS (SELECT * FROM plants WHERE user_id = $4)
       RETURNING *`, [description, frequency, plantId, userId])
   }
