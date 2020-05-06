@@ -40,71 +40,73 @@ app.use(checkJwt);
 
 
 // ---------- ROUTES ---------- //
-// Plants
+// req.user.sub is the userId forwarded from Auth0 on the client side
+
+// ----- Plants ----- //
 app.get('/plants', (req, res) => {
     console.log(req.user.sub)
     db.getAllPlants(req.user.sub).then(plants => res.send(plants))
 });
 
-app.get('/plant/:id', (req, res) => {
-    let id = parseInt(req.params.id)
-    db.getPlant(id).then(plant => res.send(plant))
-});
-
 app.post('/plant', (req, res) => {
     let { plantName, plantSpecies, plantNotes } = req.body;
-    db.addPlant(plantName, plantSpecies, plantNotes).then(plant => res.send(plant))
+    db.addPlant(plantName, plantSpecies, plantNotes, req.user.sub).then(plant => res.send(plant))
 });
 
 app.delete('/plant', (req, res) => {
     let { plantId } = req.body;
-    db.deletePlant(plantId).then(plant => res.send(plant))
+    db.deletePlant(plantId, req.user.sub).then(plant => res.send(plant))
 });
 
 app.put('/plant', (req, res) => {
     let { plantId, plantName, plantSpecies, plantNotes } = req.body;
     plantId = parseInt(plantId);
-    db.editPlant(plantId, plantName, plantSpecies, plantNotes).then(plant => res.send(plant))
+    db.editPlant(plantId, plantName, plantSpecies, plantNotes, req.user.sub).then(plant => res.send(plant))
 });
 
-// Tasks
+app.get('/plants/:id', (req, res) => {
+    let id = parseInt(req.params.id)
+    db.getPlant(id, req.user.sub).then(plant => res.send(plant))
+});
+
+// ----- Tasks ----- //
 app.get('/tasks/plant/:id', (req, res) => {
     let id = parseInt(req.params.id)
-    db.getTaskOfPlant(id).then(tasks => res.send(tasks))
+    db.getTaskOfPlant(id, req.user.sub).then(tasks => res.send(tasks))
 })
 
 app.get('/tasks', (req, res) => {
-    db.getAllTasks().then(tasks => res.send(tasks))
+    db.getAllTasks(req.user.sub).then(tasks => res.send(tasks))
 })
 
 app.post('/task', (req, res) => {
     let { description, frequency, plantId } = req.body;
-    db.addTask(description, frequency, plantId).then(task => res.send(task))
+    db.addTask(description, frequency, plantId, req.user.sub).then(task => res.send(task))
 })
 
 app.delete('/task', (req, res) => {
     let { taskId } = req.body;
-    db.deleteTask(taskId).then(task => res.send(task))
+    db.deleteTask(taskId, req.user.sub).then(task => res.send(task))
 });
 
-// Task Instances
+// ----- Task Instances ----- //
 app.get('/taskinstances', (req, res) => {
-    db.getTaskInstances().then(taskInstances => res.send(taskInstances))
+    db.getTaskInstances(req.user.sub).then(taskInstances => res.send(taskInstances))
 })
 
 app.get('/taskinstances/today', (req, res) => {
-    db.getTodayTaskInstances().then(taskInstances => res.send(taskInstances))
+    db.getTodayTaskInstances(req.user.sub).then(taskInstances => res.send(taskInstances))
 })
 
 app.get('/taskinstances/:date', (req, res) => {
     let date = req.params.date
     console.log(date)
-    db.getTaskInstancesByDay(date).then(taskInstances => res.send(taskInstances))
+    db.getTaskInstancesByDay(date, req.user.sub).then(taskInstances => res.send(taskInstances))
 })
 
 app.put('/taskinstance', (req, res) => {
     let { status, taskInstanceId } = req.body;
-    db.updateTaskInstance(status, taskInstanceId).then(taskInstance => res.send(taskInstance))
+    db.updateTaskInstance(status, taskInstanceId, req.user.sub).then(taskInstance => res.send(taskInstance))
 });
 
 // Running server
