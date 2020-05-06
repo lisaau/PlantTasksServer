@@ -42,8 +42,8 @@ app.use(checkJwt);
 // ---------- ROUTES ---------- //
 // Plants
 app.get('/plants', (req, res) => {
-    console.log(req.user)
-    db.getAllPlants().then(plants => res.send(plants))
+    console.log(req.user.sub)
+    db.getAllPlants(req.user.sub).then(plants => res.send(plants))
 });
 
 app.get('/plant/:id', (req, res) => {
