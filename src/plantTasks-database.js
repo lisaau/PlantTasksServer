@@ -94,7 +94,7 @@ class PlantTasksDatabase {
     FROM task_instances AS ti
     INNER JOIN tasks AS t ON t.id = ti.task_id
     INNER JOIN plants AS p on p.id = t.plant_id
-    WHERE date_trunc('day', ti.due_date) = date_trunc('day', now() AT TIME ZONE 'PST') AND WHERE p.user_id = $1`, userId)
+    WHERE date_trunc('day', ti.due_date) = date_trunc('day', now() AT TIME ZONE 'PST') AND p.user_id = $1`, userId)
   }
   
   getTaskInstancesByDay(date, userId) {
@@ -102,7 +102,7 @@ class PlantTasksDatabase {
     FROM task_instances AS ti 
     INNER JOIN tasks AS t ON t.id = ti.task_id
     INNER JOIN plants AS p on p.id = t.plant_id 
-    WHERE date_trunc('day', ti.due_date) = $1) AND p.user_id = $2`, [date, userId])
+    WHERE date_trunc('day', ti.due_date) = $1 AND p.user_id = $2)`, [date, userId])
   }
 
   updateTaskInstance(status, taskInstanceId, userId) {
