@@ -31,7 +31,7 @@ class PlantTasksDatabase {
   }
 
   getAllPlants(userId) {
-    return this.db.any('SELECT * FROM plants ORDER BY id WHERE user_id = $1', userId);
+    return this.db.any('SELECT * FROM plants WHERE user_id = $1 ORDER BY id', userId);
   }
 
   getPlant(plantId) {
