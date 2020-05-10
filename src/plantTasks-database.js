@@ -112,6 +112,21 @@ class PlantTasksDatabase {
         WHERE ti.id = $2 AND p.user_id = $3)
       RETURNING *`, [status, taskInstanceId, userId])
   }
+
+  insertTaskWithTaskInstances(description, frequency, plantId, userId) {
+    return db.one('insert into tasks(description, frequency, plantId) values($1, $2, $3) WHERE EXISTS (SELECT * FROM plants AS p WHERE p.id = $3 AND p.user_id = $4) RETURNING *', [description, frequency, plantId, userId])
+      .then(task => {
+         instance_promises = [...Array(10).keys()].map(i =>
+           db.one(`insert into task_instances(task_id, due_date) 
+                  values($1, NOW() + task.frequency * INTERVAL '${i} day')`, task.id)
+        )
+         return Promise.all(instance_promises).then(instance_data => ({
+           task: task,
+           instances: instance_data,
+         }))
+      });
+  }
+  
 }
 
 module.exports = PlantTasksDatabase;
