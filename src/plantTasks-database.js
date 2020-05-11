@@ -114,23 +114,36 @@ class PlantTasksDatabase {
   }
 
   // adds new task to task table and generates 10 task instances to task_instances table
-  // returns newly added task and the task instance for the current day
+  // returns newly added task and the detailed task instance for the current day
   insertTaskWithTaskInstances(description, frequency, plantId, userId) {
     return this.db.one(`INSERT INTO tasks(description, frequency, plant_id) 
       SELECT $1, $2, $3 
       WHERE EXISTS (SELECT * FROM plants AS p WHERE p.id = $3 AND p.user_id = $4) 
       RETURNING *`, [description, frequency, plantId, userId])
       .then(task => {
-        let instance_promises = [...Array(10).keys()].map(i =>
+        let instancePromises = [...Array(3).keys()].map(i =>
           this.db.any(`INSERT INTO task_instances(task_id, due_date) 
                 VALUES($1, NOW() + $2 * INTERVAL '${i} day')` +
                 (i === 0 ? 'RETURNING *': ''), [task.id, task.frequency])
       )
-         return Promise.all(instance_promises).then(instance_data => ({
-           task: task,
-           instances: instance_data.filter(instance => instance.length !== 0)[0][0],
-         }))
-      });
+      return Promise.all(instancePromises).then((instanceData) => {
+        let taskInstanceIdToday = instanceData.filter(instance => instance.length !== 0)[0][0].id
+        return this.getDetailedTaskInstanceToday(taskInstanceIdToday).then((detailedInstance) => {
+          return ( 
+            {task: task, instance: detailedInstance} 
+          )
+        })
+      })
+    });
+  }
+
+  // Helper for insertTaskWithTaskInstances
+  getDetailedTaskInstanceToday(taskInstanceId) {
+    return this.db.any(`SELECT ti.id AS task_instance_id, ti.completed, ti.due_date, t.id AS task_id, t.description, t.frequency, p.id AS plant_id, p.name
+      FROM task_instances AS ti 
+      INNER JOIN tasks AS t ON t.id = ti.task_id
+      INNER JOIN plants AS p on p.id = t.plant_id
+      WHERE ti.id = $1`, taskInstanceId)
   }
 }
 
