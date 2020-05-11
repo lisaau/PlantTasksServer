@@ -128,7 +128,7 @@ class PlantTasksDatabase {
       )
          return Promise.all(instance_promises).then(instance_data => ({
            task: task,
-           instances: instance_data.filter(instance => instance.length !== 0),
+           instances: instance_data.filter(instance => instance.length !== 0)[0][0],
          }))
       });
   }
