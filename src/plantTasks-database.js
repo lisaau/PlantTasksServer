@@ -127,10 +127,11 @@ class PlantTasksDatabase {
                 (i === 0 ? 'RETURNING *': ''), [task.id, task.frequency])
       )
       return Promise.all(instancePromises).then((instanceData) => {
-        let taskInstanceIdToday = instanceData.filter(instance => instance.length !== 0)[0][0].id
+        // extract task instance for today from nested array
+        let taskInstanceIdToday = instanceData.filter(instance => instance.length !== 0)[0][0].id 
         return this.getDetailedTaskInstanceToday(taskInstanceIdToday).then((detailedInstance) => {
           return ( 
-            {task: task, instance: detailedInstance} 
+            {task: task, instance: detailedInstance[0]} 
           )
         })
       })
