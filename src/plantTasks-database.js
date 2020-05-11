@@ -113,20 +113,25 @@ class PlantTasksDatabase {
       RETURNING *`, [status, taskInstanceId, userId])
   }
 
+  // adds new task to task table and generates 10 task instances to task_instances table
+  // returns newly added task and the task instance for the current day
   insertTaskWithTaskInstances(description, frequency, plantId, userId) {
-    return db.one('insert into tasks(description, frequency, plantId) values($1, $2, $3) WHERE EXISTS (SELECT * FROM plants AS p WHERE p.id = $3 AND p.user_id = $4) RETURNING *', [description, frequency, plantId, userId])
+    return this.db.one(`INSERT INTO tasks(description, frequency, plant_id) 
+      SELECT $1, $2, $3 
+      WHERE EXISTS (SELECT * FROM plants AS p WHERE p.id = $3 AND p.user_id = $4) 
+      RETURNING *`, [description, frequency, plantId, userId])
       .then(task => {
-         instance_promises = [...Array(10).keys()].map(i =>
-           db.one(`insert into task_instances(task_id, due_date) 
-                  values($1, NOW() + task.frequency * INTERVAL '${i} day')`, task.id)
-        )
+        let instance_promises = [...Array(10).keys()].map(i =>
+          this.db.any(`INSERT INTO task_instances(task_id, due_date) 
+                VALUES($1, NOW() + $2 * INTERVAL '${i} day')` +
+                (i === 0 ? 'RETURNING *': ''), [task.id, task.frequency])
+      )
          return Promise.all(instance_promises).then(instance_data => ({
            task: task,
-           instances: instance_data,
+           instances: instance_data.filter(instance => instance.length !== 0),
          }))
       });
   }
-  
 }
 
 module.exports = PlantTasksDatabase;

@@ -89,11 +89,12 @@ app.delete('/task', (req, res) => {
     db.deleteTask(taskId, req.user.sub).then(task => res.send(task))
 });
 
-// result is an object with task that's added and 10 instances of that task
-app.post('/task-with-taskinstances', (req, res) => {
+// result is an object with task that's added and task instance for the current day
+app.post('/task-with-taskinstance', (req, res) => {
     let { description, frequency, plantId } = req.body;
-    db.addTinsertTaskWithTaskInstancesask(description, frequency, plantId, req.user.sub).then(taskWithTaskInstances => res.send(taskWithTaskInstances))
+    db.insertTaskWithTaskInstances(description, frequency, plantId, req.user.sub).then(taskWithTaskInstance => res.send(taskWithTaskInstance))
 })
+
 
 // ----- Task Instances ----- //
 app.get('/taskinstances', (req, res) => {
