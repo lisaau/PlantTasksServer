@@ -44,7 +44,6 @@ app.use(checkJwt);
 
 // ----- Plants ----- //
 app.get('/plants', (req, res) => {
-    console.log(req.user.sub)
     db.getAllPlants(req.user.sub).then(plants => res.send(plants))
 });
 
@@ -116,8 +115,11 @@ app.put('/taskinstance', (req, res) => {
     db.updateTaskInstance(status, taskInstanceId, req.user.sub).then(taskInstance => res.send(taskInstance))
 });
 
-app.post('/taskinstances/generate', (req, res) => {
-    db.generateFutureTaskInstances(req.user.sub).then(instances => console.log('Task instances successfully generated:', instances))
+app.get('/taskinstances/generate', (req, res) => {
+    db.generateFutureTaskInstances().then(instances => {
+        console.log('GET /taskinstances/generate: Successfully created and added task instances');
+        res.send(instances);
+    });
 })
 
 // Running server

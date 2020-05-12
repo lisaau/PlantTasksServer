@@ -165,12 +165,14 @@ class PlantTasksDatabase {
       ON ti_in_future.null_id = all_ti.task_id
       WHERE ti_in_future.null_id IS NULL`, userId)
       .then(tasks => {
-        let instancePromises = tasks.map(task => [...Array(10).keys()].map(i =>
-          this.db.any(`INSERT INTO task_instances(task_id, due_date) 
-            VALUES($1, NOW() + $2 * INTERVAL '${i} day')`, [task.task_id, task.frequency]
-          ))
-        )
-      return Promise.all(instancePromises)
+        let instancePromises = tasks.map(task => {
+          return Promise.all([...Array(10).keys()].map(i => {
+            return this.db.one(`INSERT INTO task_instances(task_id, due_date)
+              VALUES($1, NOW() + $2 * INTERVAL '${i} day') RETURNING *`, [task.task_id, task.frequency]
+            )
+          }))
+        })
+        return Promise.all(instancePromises)
     })
   }
 }
