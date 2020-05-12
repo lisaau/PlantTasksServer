@@ -121,7 +121,7 @@ class PlantTasksDatabase {
       WHERE EXISTS (SELECT * FROM plants AS p WHERE p.id = $3 AND p.user_id = $4) 
       RETURNING *`, [description, frequency, plantId, userId])
       .then(task => {
-        let instancePromises = [...Array(3).keys()].map(i =>
+        let instancePromises = [...Array(10).keys()].map(i =>
           this.db.any(`INSERT INTO task_instances(task_id, due_date) 
                 VALUES($1, NOW() + $2 * INTERVAL '${i} day')` +
                 (i === 0 ? 'RETURNING *': ''), [task.id, task.frequency])
@@ -145,6 +145,33 @@ class PlantTasksDatabase {
       INNER JOIN tasks AS t ON t.id = ti.task_id
       INNER JOIN plants AS p on p.id = t.plant_id
       WHERE ti.id = $1`, taskInstanceId)
+  }
+
+  // generates 10 task instances in the future for tasks that are out of task instances
+  generateFutureTaskInstances(userId) {
+    return this.db.any(`SELECT DISTINCT all_ti.* 
+      FROM (
+      SELECT DISTINCT ti.task_id AS null_id FROM task_instances AS ti INNER JOIN tasks AS t ON ti.task_id = t.id
+        INNER JOIN plants AS p ON t.plant_id = p.id
+        WHERE p.user_id = $1
+        AND ti.due_date > now()
+      ) AS ti_in_future
+      RIGHT JOIN (
+      SELECT DISTINCT task_id, t.frequency FROM task_instances AS ti
+        INNER JOIN tasks AS t on t.id = ti.task_id
+        INNER JOIN plants AS p ON t.plant_id = p.id
+        WHERE p.user_id = $1
+      ) AS all_ti
+      ON ti_in_future.null_id = all_ti.task_id
+      WHERE ti_in_future.null_id IS NULL`, userId)
+      .then(tasks => {
+        let instancePromises = [...Array(10).keys()].map(i =>
+          this.db.any(`INSERT INTO task_instances(task_id, due_date) 
+            VALUES($1, NOW() + $2 * INTERVAL '${i} day')`, [tasks.task_id, tasks.frequency]
+          )
+        )
+      return Promise.all(instancePromises)
+    })
   }
 }
 

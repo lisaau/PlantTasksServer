@@ -116,6 +116,10 @@ app.put('/taskinstance', (req, res) => {
     db.updateTaskInstance(status, taskInstanceId, req.user.sub).then(taskInstance => res.send(taskInstance))
 });
 
+app.post('/taskinstances/generate', (req, res) => {
+    db.generateFutureTaskInstances(req.user.sub).then(() => console.log('Task instances successfully generated'))
+})
+
 // Running server
 db.sanityCheck().then(() => {
     app.listen(PORT, () => {
