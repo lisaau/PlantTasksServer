@@ -115,7 +115,7 @@ app.put('/taskinstance', (req, res) => {
     db.updateTaskInstance(status, taskInstanceId, req.user.sub).then(taskInstance => res.send(taskInstance))
 });
 
-app.get('/taskinstances/generate', (req, res) => {
+app.post('/taskinstances/generate', (req, res) => {
     db.generateFutureTaskInstances(req.user.sub).then(instances => res.send(instances));
 })
 
