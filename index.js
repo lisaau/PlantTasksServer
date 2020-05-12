@@ -117,7 +117,7 @@ app.put('/taskinstance', (req, res) => {
 });
 
 app.post('/taskinstances/generate', (req, res) => {
-    db.generateFutureTaskInstances(req.user.sub).then(() => console.log('Task instances successfully generated'))
+    db.generateFutureTaskInstances(req.user.sub).then(instances => console.log('Task instances successfully generated:', instances))
 })
 
 // Running server
